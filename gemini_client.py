@@ -15,7 +15,7 @@ def get_score(scale: str, question: str, reference: str, candidate: str) -> str:
     # Initialize the GenAI client with the API key
     client = genai.Client(api_key=api_key)
     # Choose a suitable model (e.g., Gemini 1.5 Flash)
-    model_name = "gemini-1.5-flash"
+    model_name = "gemini-2.5-flash"
     prompt = PROMPT.format(scale=scale, question=question, reference=reference, candidate=candidate)
     # Generate content using the client
     response = client.models.generate_content(model=model_name, contents=prompt)

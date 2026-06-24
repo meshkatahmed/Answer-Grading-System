@@ -10,6 +10,9 @@ import argparse
 import sys
 from utils import load_bank, parse_score
 from gemini_client import get_score
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 def grade_question(department: str, q_index: int, candidate: str, scale: str):
     questions, answers = load_bank(department)
