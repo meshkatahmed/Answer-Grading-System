@@ -6,13 +6,15 @@
 import importlib.util
 import os
 import re
-from typing import List, Tuple
+from typing import List
 
-def load_bank(department: str) -> Tuple[List[str], List[str]]:
-    """Load the question and answer lists for a given department.
+def load_bank(department: str) -> List[List]:
+    """Load the bank for a given department.
 
     The function expects a Python module at `banks/<department>.py` that defines
-    two variables: `questions` (list of str) and `answers` (list of str).
+    a `bank` variable containing a list of [question, grading_scale, reference_answer, reference_grade].
+    
+    Returns: List of bank entries, where each entry is [question, grading_scale, reference_answer, reference_grade]
     """
     base_dir = os.path.dirname(__file__)
     module_path = os.path.join(base_dir, "banks", f"{department}.py")
@@ -22,9 +24,9 @@ def load_bank(department: str) -> Tuple[List[str], List[str]]:
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
-    questions = getattr(module, "questions", [])
-    answers = getattr(module, "answers", [])
-    return questions, answers
+    bank = getattr(module, "bank", [])
+    
+    return bank
 
 
 def parse_score(response: str) -> float:

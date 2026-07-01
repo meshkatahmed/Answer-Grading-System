@@ -2,46 +2,68 @@
 """Command-line interface for the Answer Grading system.
 
 Usage example:
-    python main.py --dept math --question 0 \
-        --candidate "My answer" --scale "0-10"
+    python main.py --dept example --question_index 0 --candidate "My answer"
+    python main.py --dept example --question_index 0 --candidate "My answer" --model llama3.1
+    python main.py --dept example --question_index 0 --candidate "My answer" --model gemini
 """
 
 import argparse
 import sys
 from utils import load_bank, parse_score
-from gemini_client import get_score
+from llama3_1_client import get_score as get_score_llama
+from gemini_client import get_score as get_score_gemini
 from dotenv import load_dotenv
 
 load_dotenv()  # Load environment variables from .env file
 
-def grade_question(department: str, q_index: int, candidate: str, scale: str):
-    questions, answers = load_bank(department)
-    if q_index < 0 or q_index >= len(questions):
+def grade_question(department: str, q_index: int, candidate: str, model: str = "llama3.1"):
+    bank = load_bank(department)
+    if q_index < 0 or q_index >= len(bank):
         raise IndexError(f"Question index {q_index} out of range for department '{department}'.")
-    question = questions[q_index]
-    reference = answers[q_index]
-    raw_response = get_score(scale, question, reference, candidate)
+    
+    # Select the appropriate get_score function based on model
+    if model.lower() == "gemini":
+        get_score = get_score_gemini
+    elif model.lower() == "llama3.1":
+        get_score = get_score_llama
+    else:
+        raise ValueError(f"Unknown model: {model}. Choose 'gemini' or 'llama3.1'")
+    
+    # Extract data from bank entry: [question, grading_scale, reference_answer, reference_grade]
+    entry = bank[q_index]
+    question = entry[0]
+    grading_scale = entry[1]
+    reference = entry[2]
+    reference_grade = entry[3]
+    
+    raw_response = get_score(grading_scale, question, reference, candidate, reference_grade)
     score = parse_score(raw_response)
     return {
         "department": department,
         "question_index": q_index,
         "question": question,
+        "grading_scale": grading_scale,
         "candidate_answer": candidate,
         "reference_answer": reference,
+        "reference_grade": reference_grade,
+        "model": model,
         "raw_response": raw_response,
         "score": score,
     }
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Answer Grading CLI using Gemini LLM")
+    parser = argparse.ArgumentParser(description="Answer Grading CLI supporting multiple LLM backends")
     parser.add_argument("--dept", required=True, help="Department name (matches bank module)")
-    parser.add_argument("--question", type=int, required=True, help="Index of the question in the bank (0‑based)")
+    parser.add_argument("--question_index", type=int, required=True, help="Index of the question in the bank (0-based)")
     parser.add_argument("--candidate", required=True, help="Candidate answer text")
-    parser.add_argument("--scale", default="0-10", help="Grading scale description")
+    parser.add_argument("--model", choices=["gemini", "llama3.1"], default="llama3.1", help="LLM model to use (default: llama3.1)")
     args = parser.parse_args(argv)
     try:
-        result = grade_question(args.dept, args.question, args.candidate, args.scale)
+        result = grade_question(args.dept, args.question_index, args.candidate, args.model)
+        print(f"Model: {result['model']}")
         print("Score:", result["score"])
+        print("Grading scale:", result["grading_scale"])
+        print("Reference grade:", result["reference_grade"])
         print("Raw LLM response:\n", result["raw_response"])
     except Exception as e:
         print("Error:", e, file=sys.stderr)
