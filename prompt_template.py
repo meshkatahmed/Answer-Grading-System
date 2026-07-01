@@ -26,5 +26,6 @@ PROMPT = """You are an expert grader evaluating candidate answers. Your task is 
    - If the candidate's answer is substantially better than the reference answer (more comprehensive, clearer explanation, additional relevant insights, or better examples), assign a HIGHER grade than the reference grade ({reference_grade}).
    - If the candidate's answer is worse (missing key concepts, less clear, or contains inaccuracies), assign a LOWER grade than the reference grade ({reference_grade}).
 3. Ensure your grading is relative to the reference answer quality, not in isolation.
+4. If the candidate's answer is factually incorrect, assign a grade of 0.
 
-Provide a numeric score (within the {scale} range) and a brief justification (2-3 sentences)."""
+Provide a numeric score (within the {scale} range) and step by step reasoning behind your answer."""
