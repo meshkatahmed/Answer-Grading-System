@@ -9,8 +9,8 @@ from prompt_template import PROMPT
 def get_score(scale: str, question: str, reference: str, candidate: str, reference_grade: int) -> str:
     """Build the prompt and call ollama (llama3.1), returning the raw response string.
     """
-    ollama_endpoint = "http://localhost:11434/api/generate"
-    model_name = "llama3.1"
+    ollama_endpoint = "http://192.168.1.9:11434/api/generate"
+    model_name = "llama3.1:8b"
     
     prompt = PROMPT.format(
         scale=scale,    
@@ -27,7 +27,7 @@ def get_score(scale: str, question: str, reference: str, candidate: str, referen
     }
     
     try:
-        response = requests.post(ollama_endpoint, json=payload, timeout=120)
+        response = requests.post(ollama_endpoint, json=payload, timeout=240)
         response.raise_for_status()
         result = response.json()
         return result.get("response", "")

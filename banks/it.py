@@ -3,7 +3,7 @@ bank = [
         "What is FastAPI?",
         "0-10",
         "FastAPI is a modern, fast (high-performance) web framework for building APIs with Python 3.6+ based on standard Python type hints.",
-        10
+        8
     ],
     [
         "Explain how to give LLMs access to a knowledge base.",

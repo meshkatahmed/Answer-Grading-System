@@ -30,10 +30,24 @@ def load_bank(department: str) -> List[List]:
 
 
 def parse_score(response: str) -> float:
-    """Extract the first numeric value (int or float) from Gemini's response.
-    Returns the number as float. Raises ValueError if no number is found.
+    """Extract the grade awarded to the candidate from the LLM response.
+
+    The parser prefers explicit grade labels such as "Candidate grade: 8",
+    "**Grade:** 8", or "Grade: 8". If no grade label is present, it falls
+    back to the first numeric value in the response. Raises ValueError if no
+    number is found.
     """
+    grade_patterns = [
+        r"\b(?:candidate\s+)?grade\b[^\d\n]*?([-+]?[0-9]*\.?[0-9]+)",
+        r"\b(?:score|marks?)\b[^\d\n]*?([-+]?[0-9]*\.?[0-9]+)",
+    ]
+
+    for pattern in grade_patterns:
+        match = re.search(pattern, response, re.IGNORECASE)
+        if match:
+            return float(match.group(1))
+
     match = re.search(r"[-+]?[0-9]*\.?[0-9]+", response)
     if not match:
-        raise ValueError("No numeric score found in Gemini response")
+        raise ValueError("No numeric score found in LLM response")
     return float(match.group())
