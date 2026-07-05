@@ -60,10 +60,12 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         result = grade_question(args.dept, args.question_index, args.candidate, args.model)
+        print("----------------------------------------")
         print(f"Model: {result['model']}")
         print("Score:", result["score"])
         print("Grading scale:", result["grading_scale"])
         print("Reference grade:", result["reference_grade"])
+        print("----------------------------------------")
         print("Raw LLM response:\n", result["raw_response"])
     except Exception as e:
         print("Error:", e, file=sys.stderr)

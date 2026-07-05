@@ -22,5 +22,17 @@ bank = [
         "0-10",
         "def add_numbers(a, b):\n    return a + b",
         10
+    ],
+    [
+        "Write a Python function that takes a list of numbers and returns the average.",
+        "0-10",
+        "def average(numbers):\n    return sum(numbers) / len(numbers) if numbers else 0",
+        10
+    ],
+    [
+        "How does an LLM works?",
+        "0-10",
+        "An LLM (Large Language Model) works by using deep learning techniques, particularly transformer architectures, to process and generate human-like text based on the patterns it has learned from vast amounts of training data. It predicts the next word in a sequence given the previous words, allowing it to generate coherent and contextually relevant responses.",
+        9
     ]
 ]

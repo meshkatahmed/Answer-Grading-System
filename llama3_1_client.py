@@ -24,6 +24,8 @@ def get_score(scale: str, question: str, reference: str, candidate: str, referen
         "model": model_name,
         "prompt": prompt,
         "stream": False,
+        "temperature": 0,
+        "verbose": False,
     }
     
     try:

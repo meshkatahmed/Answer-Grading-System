@@ -33,19 +33,25 @@ def parse_score(response: str) -> float:
     """Extract the grade awarded to the candidate from the LLM response.
 
     The parser prefers explicit grade labels such as "Candidate grade: 8",
-    "**Grade:** 8", or "Grade: 8". If no grade label is present, it falls
-    back to the first numeric value in the response. Raises ValueError if no
-    number is found.
+    "**Grade:** 8", or "Grade: 8". If multiple grade-like labels appear,
+    it uses the last one so that a final grading statement overrides earlier
+    reasoning or examples. If no grade label is present, it falls back to the
+    last numeric value in the response. Raises ValueError if no number is
+    found.
     """
     grade_patterns = [
         r"\b(?:candidate\s+)?grade\b[^\d\n]*?([-+]?[0-9]*\.?[0-9]+)",
-        r"\b(?:score|marks?)\b[^\d\n]*?([-+]?[0-9]*\.?[0-9]+)",
+        r"\b(?:final\s+)?(?:score|marks?)\b[^\d\n]*?([-+]?[0-9]*\.?[0-9]+)",
+        r"\*\*grade\*\*[:\s]*([-+]?[0-9]*\.?[0-9]+)",
     ]
 
+    matches = []
     for pattern in grade_patterns:
-        match = re.search(pattern, response, re.IGNORECASE)
-        if match:
-            return float(match.group(1))
+        matches.extend(re.finditer(pattern, response, re.IGNORECASE))
+
+    if matches:
+        last_match = matches[-1]
+        return float(last_match.group(1))
 
     match = re.search(r"[-+]?[0-9]*\.?[0-9]+", response)
     if not match:
