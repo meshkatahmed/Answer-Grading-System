@@ -4,7 +4,7 @@ Requires the environment variable GEMINI_API_KEY to be set.
 """
 import os
 from google import genai  # Updated import for new SDK
-from prompt_template import PROMPT
+from prompt_templates.prompt_template import PROMPT
 
 def get_score(scale: str, question: str, reference: str, candidate: str, reference_grade: int) -> str:
     """Build the prompt and call Gemini, returning the raw response string.

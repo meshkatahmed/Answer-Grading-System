@@ -49,6 +49,16 @@ def parse_score(response: str) -> float:
     for pattern in grade_patterns:
         matches.extend(re.finditer(pattern, response, re.IGNORECASE))
 
+    # Completely new for benchmarking:If the response is a model result dict, prefer the explicit score field.
+    if isinstance(response, dict):
+        if "score" in response:
+            return float(response["score"])
+        if "response" in response and isinstance(response["response"], str):
+            response = response["response"]
+        else:
+            # Fallback to the raw dict string if no explicit score is present.
+            response = str(response)
+
     if matches:
         last_match = matches[-1]
         return float(last_match.group(1))
